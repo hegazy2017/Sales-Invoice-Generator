@@ -40,10 +40,10 @@ public class test {
         Date date ;
         String InvoiceHeader = "InvoiceHeader.csv";
         String InvoiceLine = "InvoiceLine.csv";
-         File fileInvoiceHeader = new File(InvoiceHeader); 
-         File fInvoiceLine = new File(InvoiceLine); 
+         File invoiceHeaderFile = new File(InvoiceHeader); 
+         File invoiceLineFile = new File(InvoiceLine); 
            try {
-       for (int i = 1; i <= numOfInvoices; i++) {
+      for (int i = 1; i <= numOfInvoices; i++) {
             invoiceNum = i;
              //----------------------- Fill Invoice Header----------------------
             System.out.println("Enter First Invoice Date");
@@ -66,21 +66,11 @@ public class test {
             invoiceHeaderList.add(ih);
             
         }
-    
-         
-        if(!InvoiceHeader.contains("csv")){
+        if(!InvoiceHeader.contains("csv")&&!InvoiceLine.contains("csv")){
               System.out.println("Error Extension");
         }else{    
-         
-        
-         for (InvoiceHeader il2 : invoiceHeaderList) {
-           // System.out.println(il2.getInvoiceNum()+"\n" +"{ \n" + il2.getInvoiceDate() + "," + il2.getCustomerName());
-                 ilist2  = il2.getInvoiceLines();
-                 for(InvoiceLine inl : ilist2){
-              //     System.out.println(inl.getItemName() + "," + inl.getItemPrice() + "," + inl.getCount()+"\n"+"}"); 
-                 } 
-        }
-          fo.writeFile(invoiceHeaderList,fileInvoiceHeader,fInvoiceLine);
+
+      fo.writeFile(invoiceHeaderList,invoiceHeaderFile,invoiceLineFile);
        System.out.println("-------------- Writing Done----------");
         }
         
@@ -91,10 +81,19 @@ public class test {
      
            
         
-       
-     /*  ArrayList<InvoiceHeader> listInvoicesList = fo.readFile(f);
-       System.out.println(listInvoicesList.size());
+   
       
-         */
+      
+       ArrayList<InvoiceHeader> invoiceHeaderL = fo.readInvoiceHeaderFromCSV(InvoiceHeader,InvoiceLine);
+      for(InvoiceHeader i : invoiceHeaderL){
+          System.out.println(i.getInvoiceNum()+"\n"+"{"+"\n"+i.getInvoiceDate()+","+i.getCustomerName());
+        ArrayList<InvoiceLine> listInvoicesList = i.getInvoiceLines();
+      for(InvoiceLine lines : listInvoicesList){
+           System.out.println(lines.getItemName() + "," + lines.getItemPrice() + "," + lines.getCount()); 
+      }
+       System.out.println("}");
+      }
+     
+         
     }
 }

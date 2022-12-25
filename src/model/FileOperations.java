@@ -10,9 +10,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -24,31 +29,60 @@ import java.util.logging.Logger;
  */
 public class FileOperations {
 
-    public  ArrayList<InvoiceHeader> readFile(File f) {
-       
-        if(f.exists()){
-            String[] data  ;
-            ArrayList<InvoiceHeader> list=null;
-        try {
-            BufferedReader csvReader = new BufferedReader(new FileReader(f));
-            String row = null;
-            while ((row = csvReader.readLine()) != null) {
-                data= row.split(",");
-               
-           //  System.out.println(data[0]);
+    
+    public  ArrayList<InvoiceHeader> readInvoiceHeaderFromCSV(String fileName,String file2) {
+        ArrayList<InvoiceHeader> invoiceHeader = new ArrayList<InvoiceHeader>();
+        Path pathToFile = Paths.get(fileName);
+        try (BufferedReader br = Files.newBufferedReader(pathToFile,
+                StandardCharsets.US_ASCII)) {
+            String line = br.readLine();
+            while (line != null) {
+                String[] attributes = line.split(",");
+                InvoiceHeader invoiceheader = createinvoiceHeader(attributes,file2);
+                invoiceHeader.add(invoiceheader);
+                line = br.readLine();
             }
-            csvReader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
-    return  list;
-       
-        }else{
-            System.out.println("File Not found");
-        }
-        return  null;
+        return invoiceHeader;
     }
     
+    private  InvoiceHeader createinvoiceHeader(String[] metadata,String fileName) {
+        int invoiceNum = Integer.parseInt(metadata[0]);
+        String invoiceDate = metadata[1];
+        String customerName = metadata[2];
+        return new InvoiceHeader(invoiceNum, invoiceDate,customerName,readInvoiceLineFromCSV(fileName));
+    }
+    
+  public  ArrayList<InvoiceLine> readInvoiceLineFromCSV(String fileName) {
+        ArrayList<InvoiceLine> invoiceLine = new ArrayList<InvoiceLine>();
+        Path pathToFile = Paths.get(fileName);
+        try (BufferedReader br = Files.newBufferedReader(pathToFile,
+                StandardCharsets.US_ASCII)) {
+            String line = br.readLine();
+            while (line != null) {
+                String[] attributes = line.split(",");
+                InvoiceLine invoice = createinvoiceLine(attributes);
+                invoiceLine.add(invoice);
+                line = br.readLine();
+            }
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return invoiceLine;
+    }
+ private static InvoiceLine createinvoiceLine(String[] metadata) {
+        String itemName = metadata[0];
+        int itemPrice = Integer.parseInt(metadata[1]);
+        int count = Integer.parseInt(metadata[2]);
+        return new InvoiceLine(itemName, itemPrice, count);
+    }
+
+
+
     
  
  public void writeFile(ArrayList<InvoiceHeader> invoiceList,File invoiceHeaderFile, File invoiceLineFile) {
@@ -58,6 +92,8 @@ public class FileOperations {
             invoiceHeaderWriter = new FileWriter(invoiceHeaderFile);
             invoiceLineWriter   = new FileWriter(invoiceLineFile);
             for (InvoiceHeader rowData : invoiceList) {
+                invoiceHeaderWriter.write(String.valueOf(rowData.getInvoiceNum()));
+                invoiceHeaderWriter.write(",");
                 invoiceHeaderWriter.write(rowData.getInvoiceDate().toString());
                 invoiceHeaderWriter.write(",");
                  invoiceHeaderWriter.write(rowData.getCustomerName());
@@ -87,49 +123,5 @@ public class FileOperations {
         }
 
     }
-   /* public void writeFile(ArrayList<InvoiceHeader> invoiceList,File f) {
-        FileWriter csvWriter = null;
-        try {
-            csvWriter = new FileWriter(f);
-            for (InvoiceHeader rowData : invoiceList) {
-                csvWriter.write(rowData.getInvoiceDate().toString());
-                csvWriter.write(",");
-                 csvWriter.write(rowData.getCustomerName());
-                csvWriter.write("\n");
-                for(InvoiceLine inLine : rowData.getInvoiceLines()){
-                    csvWriter.write(inLine.getItemName());
-                    csvWriter.write(",");
-                    csvWriter.write(String.valueOf(inLine.getItemPrice()));
-                    csvWriter.write(",");
-                    csvWriter.write(String.valueOf(inLine.getCount()));
-                    csvWriter.write("\n");
-                }
-            }
-            csvWriter.flush();
-            csvWriter.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                csvWriter.close();
-            } catch (IOException ex) {
-               ex.printStackTrace();
-            }
-        }
 
-    }*/
-
-    public Date getCurrentDate() {
-         Date date,date1=null;
-        try {
-            SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy");
-             date = new Date();
-             date1=new SimpleDateFormat("dd/MM/yyyy").parse(f.format(date));
-         
-        } catch (ParseException ex) {
-            Logger.getLogger(FileOperations.class.getName()).log(Level.SEVERE, null, ex);
-        }
-           return (date1);
-     
-    }
 }
