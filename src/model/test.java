@@ -50,8 +50,6 @@ public class test {
          
                 formatter.setLenient(false);
                 date = formatter.parse(invoiceDate);
-                System.out.print(String.valueOf(date));
-            
             System.out.println("Enter First Invoice Customer Name");
             customerName = in.next();
             //----------------------- Fill Invoice Line-------------------------
