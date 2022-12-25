@@ -7,14 +7,11 @@ package model;
 
 import java.io.File;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -41,8 +38,12 @@ public class test {
         FileOperations fo = new FileOperations();
         DateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
         Date date ;
+        String InvoiceHeader = "InvoiceHeader.csv";
+        String InvoiceLine = "InvoiceLine.csv";
+         File fileInvoiceHeader = new File(InvoiceHeader); 
+         File fInvoiceLine = new File(InvoiceLine); 
            try {
-        for (int i = 1; i <= numOfInvoices; i++) {
+       for (int i = 1; i <= numOfInvoices; i++) {
             invoiceNum = i;
              //----------------------- Fill Invoice Header----------------------
             System.out.println("Enter First Invoice Date");
@@ -66,21 +67,20 @@ public class test {
             
         }
     
-         String fileName = "InvoiceHeader.csv";
-        if(!fileName.contains("csv")){
+         
+        if(!InvoiceHeader.contains("csv")){
               System.out.println("Error Extension");
         }else{    
-        File f = new File("InvoiceHeader.csv");   
+         
         
          for (InvoiceHeader il2 : invoiceHeaderList) {
-            System.out.println(il2.getInvoiceNum()+"\n" +"{ \n" + il2.getInvoiceDate() + "," + il2.getCustomerName()+"\n");
-     
+           // System.out.println(il2.getInvoiceNum()+"\n" +"{ \n" + il2.getInvoiceDate() + "," + il2.getCustomerName());
                  ilist2  = il2.getInvoiceLines();
                  for(InvoiceLine inl : ilist2){
-                   System.out.println(inl.getItemName() + "," + inl.getItemPrice() + "," + inl.getCount()+"\n"+"}"); 
+              //     System.out.println(inl.getItemName() + "," + inl.getItemPrice() + "," + inl.getCount()+"\n"+"}"); 
                  } 
         }
-          fo.writeFile(invoiceHeaderList,f);
+          fo.writeFile(invoiceHeaderList,fileInvoiceHeader,fInvoiceLine);
        System.out.println("-------------- Writing Done----------");
         }
         
@@ -91,11 +91,10 @@ public class test {
      
            
         
-       /*
-       List<InvoiceHeader> listInvoicesList = fo.readFile(f);
-       listInvoicesList.forEach((inread) -> {
-           System.out.println("Read"+inread.getCustomerName());
-           });
+       
+     /*  ArrayList<InvoiceHeader> listInvoicesList = fo.readFile(f);
+       System.out.println(listInvoicesList.size());
+      
          */
     }
 }

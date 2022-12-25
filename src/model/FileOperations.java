@@ -24,16 +24,18 @@ import java.util.logging.Logger;
  */
 public class FileOperations {
 
-    public  List<InvoiceHeader> readFile(File f) {
+    public  ArrayList<InvoiceHeader> readFile(File f) {
+       
         if(f.exists()){
             String[] data  ;
-            List<InvoiceHeader> list=null;
+            ArrayList<InvoiceHeader> list=null;
         try {
             BufferedReader csvReader = new BufferedReader(new FileReader(f));
             String row = null;
             while ((row = csvReader.readLine()) != null) {
                 data= row.split(",");
-             System.out.println(data[0]);
+               
+           //  System.out.println(data[0]);
             }
             csvReader.close();
         } catch (Exception e) {
@@ -46,8 +48,46 @@ public class FileOperations {
         }
         return  null;
     }
+    
+    
+ 
+ public void writeFile(ArrayList<InvoiceHeader> invoiceList,File invoiceHeaderFile, File invoiceLineFile) {
+        FileWriter invoiceHeaderWriter = null;
+        FileWriter invoiceLineWriter = null;
+        try {
+            invoiceHeaderWriter = new FileWriter(invoiceHeaderFile);
+            invoiceLineWriter   = new FileWriter(invoiceLineFile);
+            for (InvoiceHeader rowData : invoiceList) {
+                invoiceHeaderWriter.write(rowData.getInvoiceDate().toString());
+                invoiceHeaderWriter.write(",");
+                 invoiceHeaderWriter.write(rowData.getCustomerName());
+                invoiceHeaderWriter.write("\n");
+                for(InvoiceLine inLine : rowData.getInvoiceLines()){
+                    invoiceLineWriter.write(inLine.getItemName());
+                    invoiceLineWriter.write(",");
+                    invoiceLineWriter.write(String.valueOf(inLine.getItemPrice()));
+                    invoiceLineWriter.write(",");
+                    invoiceLineWriter.write(String.valueOf(inLine.getCount()));
+                    invoiceLineWriter.write("\n");
+                }
+            }
+            invoiceHeaderWriter.flush();
+            invoiceLineWriter.flush();
+            invoiceHeaderWriter.close();
+            invoiceLineWriter.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                invoiceHeaderWriter.close();
+            invoiceLineWriter.close();
+            } catch (IOException ex) {
+               ex.printStackTrace();
+            }
+        }
 
-    public void writeFile(ArrayList<InvoiceHeader> invoiceList,File f) {
+    }
+   /* public void writeFile(ArrayList<InvoiceHeader> invoiceList,File f) {
         FileWriter csvWriter = null;
         try {
             csvWriter = new FileWriter(f);
@@ -77,7 +117,7 @@ public class FileOperations {
             }
         }
 
-    }
+    }*/
 
     public Date getCurrentDate() {
          Date date,date1=null;
